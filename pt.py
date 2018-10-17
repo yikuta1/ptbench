@@ -307,4 +307,4 @@ def pt(path):
     return 0
 
 if __name__ == '__main__':
-    pt('pt.ppm')
+    pt('./images/pt.ppm')
