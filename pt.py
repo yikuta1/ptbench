@@ -3,17 +3,17 @@
 
 import math
 import random
-import time
+# import time
 
-#PI = 3.14159265358979323846
+# PI = 3.14159265358979323846
 WIDTH = 256
 HEIGHT = 256
 NSUBSAMPLES = 2
 NAO_SAMPLES = 8
-NPATH_SAMPLES   = 4
+NPATH_SAMPLES = 4
 MAX_TRACE_DEPTH = 8
-#NPATH_SAMPLES   = 128
-#MAX_TRACE_DEPTH = 16
+# NPATH_SAMPLES   = 128
+# MAX_TRACE_DEPTH = 16
 
 # render objects
 sphere1 = []
@@ -21,11 +21,15 @@ sphere2 = []
 sphere3 = []
 plane = []
 rimg = []
-#isect = [1.0e+17, [0, 0, 0], [0, 0, 0], [0, 0, 0], [0.0, 0.0, 0.0], 0] # distance, position[], normal[], color[], emissiveCol[], hit
+
+# distance, position[], normal[], color[], emissiveCol[], hit
+# isect = [1.0e+17, [0, 0, 0], [0, 0, 0], [0, 0, 0], [0.0, 0.0, 0.0], 0]
+
 
 def vdot(v0, v1):
     c = v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2]
     return c
+
 
 def vcross(v0, v1):
     c = [0] * 3
@@ -33,6 +37,7 @@ def vcross(v0, v1):
     c[1] = v0[2] * v1[0] - v0[0] * v1[2]
     c[2] = v0[0] * v1[1] - v0[1] * v1[0]
     return c
+
 
 def vnormalize(c):
     length = math.sqrt(vdot(c, c))
@@ -76,6 +81,7 @@ def ray_sphere_intersect(isect, ray, sphere):
             isect[4][2] = sphere[3][2]
     return isect
 
+
 def ray_plane_intersect(isect, ray, plane):
     ro = ray[0]
     rd = ray[1]
@@ -107,6 +113,7 @@ def ray_plane_intersect(isect, ray, plane):
         isect[4][2] = plane[3][2]
     return isect
 
+
 def orthoBasis(basis, n):
     b2 = n
     b0 = basis[0]
@@ -127,6 +134,7 @@ def orthoBasis(basis, n):
     basis[0] = b0
     basis[2] = b2
 
+
 def clamp(f):
     i = f * 255.5
     if (i < 0):
@@ -135,16 +143,17 @@ def clamp(f):
         i = 255
     return i
 
+
 def trace(ray, depth):
     global NAO_SAMPLES
     global sphere1
     global sphere2
     global sphere3
     global plane
-    #global isect
+    # global isect
 
-    #print MAX_TRACE_DEPTH
-    #print depth
+    # print MAX_TRACE_DEPTH
+    # print depth
     if depth >= MAX_TRACE_DEPTH:
         return [0.0, 0.0, 0.0]
 
@@ -152,7 +161,7 @@ def trace(ray, depth):
     # 1. find nearest intersection.
     #
     isect = [1.0e+17, [0, 0, 0], [0, 0, 0], [0, 0, 0], [0.0, 0.0, 0.0], 0]
-    #isect = [1.0e+17, 0, 0, 0, 0, 0, 0, 0]
+    # isect = [1.0e+17, 0, 0, 0, 0, 0, 0, 0]
     isect = ray_sphere_intersect(isect, ray, sphere1)
     isect = ray_sphere_intersect(isect, ray, sphere2)
     isect = ray_sphere_intersect(isect, ray, sphere3)
@@ -165,7 +174,7 @@ def trace(ray, depth):
     # 2. Pick a random ray direction with importance sampling.
     #    p = cos(theta) / PI
     #
-    #PI = 3.14159265358979323846
+    # PI = 3.14159265358979323846
     theta = random.random()
     phi = 2.0 * math.pi * random.random()
 
@@ -188,12 +197,14 @@ def trace(ray, depth):
     # Slightly move ray org towards ray dir to avoid numerical probrem.
     eps = 0.0001
 
-    p = [isect[1][0] + eps * rx, isect[1][1] + eps * ry, isect[1][2] + eps * rz]
+    p = [isect[1][0] + eps * rx,
+         isect[1][1] + eps * ry,
+         isect[1][2] + eps * rz]
     newRay = [p, [rx, ry, rz]]
 
-    fscale = 1.0 / math.pi # diffuse. BRDF / PI
+    fscale = 1.0 / math.pi  # diffuse. BRDF / PI
     fr = [isect[3][0] * fscale, isect[3][1] * fscale, isect[3][2] * fscale]
-    cosTheta = vdot([rx, ry, rz], [isect[2][0], isect[2][1], isect[2][2]])
+    # cosTheta = vdot([rx, ry, rz], [isect[2][0], isect[2][1], isect[2][2]])
     # Ray.dir . N
     Li = trace(newRay, depth + 1)
     Le = [isect[4][0], isect[4][1], isect[4][2]]
@@ -210,6 +221,7 @@ def trace(ray, depth):
 
     return Lo
 
+
 def pathTrace(ray):
     i = 0
 
@@ -221,13 +233,14 @@ def pathTrace(ray):
         col[2] += tcol[2]
 
     scale = 1.0 / (float)(NPATH_SAMPLES)
-    #print col
-    #print scale
+    # print col
+    # print scale
     col[0] *= scale
     col[1] *= scale
     col[2] *= scale
-    #print('%f %f %f\n'%(col[0], col[1], col[2]))
+    # print('%f %f %f\n'%(col[0], col[1], col[2]))
     return col
+
 
 def render(w, h, nsubsamples):
     global sphere1
@@ -266,6 +279,7 @@ def render(w, h, nsubsamples):
             rimg[3 * (y * w + x) + 2] = clamp(fimg[3 * (y * w + x) + 2])
     return rimg
 
+
 def init_scene():
     global sphere1
     global sphere2
@@ -278,17 +292,19 @@ def init_scene():
     plane = [[0.0, -0.5, 0.0], [0.0, 1.0, 0.0], [0.5, 0.5, 0.5],
              [0.0, 0.0, 0.0]]
 
+
 def saveppm(fname, w, h, rimg):
     fp = open(fname, 'w')
 
     fp.write('P3\n')
-    fp.write('%i %i\n'%(w, h))
+    fp.write('%i %i\n' % (w, h))
     fp.write('255\n')
     for i in range(w * h * 3):
-        fp.write('%i '%rimg[i])
+        fp.write('%i ' % rimg[i])
         if(0 == (i + 1) % 3):
             fp.write('\n')
     fp.close()
+
 
 def pt(path):
     global rimg
@@ -305,6 +321,7 @@ def pt(path):
     # final_time = time.clock() - t
     # print "final time: " + str(final_time) + " seconds"
     return 0
+
 
 if __name__ == '__main__':
     pt('./images/pt.ppm')
