@@ -1,2 +1,2 @@
 # ptbench
-Path Tracer benchmark project 
+Path Tracer benchmark project.
